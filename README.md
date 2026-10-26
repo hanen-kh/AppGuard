@@ -46,20 +46,9 @@ AppGuard helps operations teams understand what is running across client environ
 
 ## 🔄 Event pipeline
 
-```mermaid
-flowchart LR
-    Sources[Applications and servers] --> Topics[Kafka topics<br/>logs and metrics]
-    Topics --> API[AppGuard Spring Boot API]
-    API --> Discovery[Discover and register<br/>apps, servers, services]
-    Discovery <--> Redis[(Redis cache and queues)]
-    API --> Storage[(MySQL, MongoDB<br/>and Elasticsearch)]
-    API --> Live[WebSocket updates]
-    Live --> UI[Angular dashboard]
-    API --> Quartz[Quartz scheduler]
-    Quartz --> Agent[Cron agent on target server]
-    Agent --> Results[Execution result and history]
-    Results --> API
-```
+<p align="center">
+  <img src="appguard_architecture.png" alt="AppGuard architecture" width="100%" />
+</p>
 
 Kafka listeners in the central application consume the `app-logs`, `system-metrics`, and `new-service-metrics` streams. The backend performs quick checks on incoming events, uses Redis to avoid repeatedly processing known entities and queue discovery work, then processes pending discoveries in batches. Relevant updates are persisted and sent to dashboard subscribers.
 
