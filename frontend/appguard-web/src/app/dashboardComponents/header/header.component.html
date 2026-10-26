@@ -1,0 +1,386 @@
+<div class="notification-system">
+  <button class="notif-btn" (click)="toggleNotifications()">
+    <div class="bell-container">
+      <i class="fas fa-bell"></i>
+      <i class="fas fa-bell-slash muted"></i>
+      <div class="notification-pulse"></div>
+    </div>
+    <span class="notif-counter">{{ unreadCount }}</span>
+  </button>
+
+  <div class="notification-bar" *ngIf="showNotifications">
+    <div class="notification-header">
+      <i class="fas fa-bell"></i>
+      <h3>Notifications</h3>
+      <button class="clear-btn" (click)="markAllAsRead()">
+        <i class="fas fa-check-double"></i> Mark all as read
+      </button>
+    </div>
+    
+    <div class="notification-list">
+      <div class="notification-item" *ngFor="let alert of alerts" 
+           [ngClass]="{'unread': alert.type.includes('unread')}">
+        <div class="notification-icon" [ngClass]="{
+          'error': alert.type === 'error',
+          'warning': alert.type === 'warning',
+          'success': alert.type === 'success'
+        }">
+          <i *ngIf="alert.type === 'error'" class="fas fa-exclamation-circle"></i>
+          <i *ngIf="alert.type === 'warning'" class="fas fa-exclamation-triangle"></i>
+          <i *ngIf="alert.type === 'success'" class="fas fa-check-circle"></i>
+        </div>
+        <div class="notification-content">
+          <p class="notification-title">{{ alert.type === 'error' ? 'Erreur Critique' : 
+                                          alert.type === 'warning' ? 'Avertissement' : 'Information' }}</p>
+          <p class="notification-message">{{ alert.message }}</p>
+          <div class="notification-footer">
+            <span class="notification-time">{{ alert.time }}</span>
+            <button class="action-btn" (click)="navigateToMetrics(); $event.stopPropagation()">
+              <i class="fas fa-chart-line"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="notification-view-all" *ngIf="alerts.length > 3">
+      <button class="view-all-btn" (click)="navigateToMetrics()">
+        <i class="fas fa-list"></i> Voir toutes les notifications
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Système de Notifications */
+.notification-system {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+/* Bouton Principal */
+.notif-btn {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border: none;
+  background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(110, 142, 251, 0.4);
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  overflow: visible;
+}
+
+.notif-btn:hover {
+  transform: scale(1.1) rotate(10deg);
+  box-shadow: 0 15px 40px rgba(110, 142, 251, 0.6);
+}
+
+/* Conteneur Cloche */
+.bell-container {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  color: white;
+  transition: transform 0.3s;
+}
+
+.notif-btn:hover .bell-container {
+  animation: ring 0.8s ease-in-out;
+}
+
+/* Icônes Cloche */
+.fa-bell, .fa-bell-slash {
+  position: absolute;
+  font-size: 1.4rem;
+  transition: all 0.4s;
+}
+
+.fa-bell-slash {
+  opacity: 0;
+  transform: rotate(-45deg);
+}
+
+.notif-btn.active .fa-bell {
+  opacity: 0;
+  transform: rotate(30deg);
+}
+
+.notif-btn.active .fa-bell-slash {
+  opacity: 1;
+  transform: rotate(0);
+}
+
+/* Animation Sonnerie */
+@keyframes ring {
+  0%, 100% { transform: rotate(0); }
+  15% { transform: rotate(20deg); }
+  30% { transform: rotate(-15deg); }
+  45% { transform: rotate(10deg); }
+  60% { transform: rotate(-5deg); }
+  75% { transform: rotate(2deg); }
+}
+
+/* Compteur de Notifications */
+.notif-counter {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ff4757;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border: 3px solid #fff;
+  animation: pulse 1.5s infinite;
+  box-shadow: 0 3px 10px rgba(255, 71, 87, 0.5);
+}
+
+/* Effet Pulsation */
+.notification-pulse {
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 71, 87, 0.3);
+  border-radius: 50%;
+  opacity: 0;
+  scale: 0.5;
+}
+
+.notif-btn:hover .notification-pulse {
+  animation: pulse-anim 2s infinite;
+}
+
+@keyframes pulse-anim {
+  0% {
+    opacity: 0.8;
+    scale: 0.5;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.3;
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* Barre de Notifications */
+.notification-bar {
+  position: absolute;
+  top: 70px;
+  right: 0;
+  width: 380px;
+  max-height: 70vh;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+  overflow: hidden;
+  animation: slideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  transform-origin: top right;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* En-tête */
+.notification-header {
+  display: flex;
+  align-items: center;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
+  color: white;
+  position: relative;
+}
+
+.notification-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-left: 10px;
+  flex-grow: 1;
+}
+
+.clear-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.3s;
+}
+
+.clear-btn:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* Liste des Notifications */
+.notification-list {
+  max-height: calc(70vh - 120px);
+  overflow-y: auto;
+  padding: 10px 0;
+}
+
+.notification-item {
+  display: flex;
+  padding: 15px 20px;
+  transition: all 0.3s;
+  border-left: 4px solid transparent;
+}
+
+.notification-item.unread {
+  background: rgba(110, 142, 251, 0.05);
+  border-left-color: #6e8efb;
+}
+
+.notification-item:hover {
+  background: rgba(110, 142, 251, 0.08);
+}
+
+.notification-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+.notification-icon.error {
+  background: rgba(255, 71, 87, 0.1);
+  color: #ff4757;
+}
+
+.notification-icon.warning {
+  background: rgba(255, 165, 0, 0.1);
+  color: #ffa500;
+}
+
+.notification-icon.success {
+  background: rgba(46, 213, 115, 0.1);
+  color: #2ed573;
+}
+
+.notification-content {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.notification-title {
+  margin: 0 0 5px 0;
+  font-weight: 600;
+  color: #2f3542;
+  font-size: 0.95rem;
+}
+
+.notification-message {
+  margin: 0 0 8px 0;
+  color: #57606f;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.notification-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-time {
+  color: #a4b0be;
+  font-size: 0.75rem;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  color: #6e8efb;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 5px;
+  opacity: 0.7;
+  transition: all 0.3s;
+}
+
+.action-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Pied de page */
+.notification-view-all {
+  padding: 15px;
+  border-top: 1px solid #f1f3f6;
+  text-align: center;
+}
+
+.view-all-btn {
+  background: none;
+  border: none;
+  color: #6e8efb;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  border-radius: 20px;
+  transition: all 0.3s;
+}
+
+.view-all-btn:hover {
+  background: rgba(110, 142, 251, 0.1);
+}
+
+/* Scrollbar */
+.notification-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notification-list::-webkit-scrollbar-track {
+  background: #f1f3f6;
+}
+
+.notification-list::-webkit-scrollbar-thumb {
+  background: #ced6e0;
+  border-radius: 3px;
+}
+
+.notification-list::-webkit-scrollbar-thumb:hover {
+  background: #a4b0be;
+}
+</style>

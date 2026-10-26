@@ -1,0 +1,48 @@
+  <!-- <h2 class="dashboard-title">Applications à Superviser</h2>
+
+      <div class="app-list">
+        <div class="app-card" *ngFor="let app of applications" (click)="selectApp(app)">
+          <div class="app-name">{{ app.name }}</div>
+          <div class="app-client">Client : {{ app.clientName }}</div>
+          <div class="app-date">Créée le : {{ app.createdAt | date: 'shortDate' }}</div>
+        </div>
+      </div>
+      
+      
+      
+.app-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);  gap: 16px;
+}
+
+.app-card {
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.app-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 8px rgba(50, 2, 180, 0.15);
+}
+
+.app-name {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.app-client,
+.app-date {
+  font-size: 14px;
+  color: #555;
+}
+
+
+      
+      
+      -->

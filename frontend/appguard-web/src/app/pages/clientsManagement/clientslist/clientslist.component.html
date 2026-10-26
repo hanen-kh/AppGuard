@@ -1,0 +1,208 @@
+<!-- client.component.html -->
+<div class="app-layout">
+  <app-sidebar></app-sidebar>
+  <app-header></app-header>
+
+  <div class="contentt">
+    <!-- Main Header -->
+    <header class="main-header">
+      <div class="header-content">
+        <div class="brand-section">
+          <div class="brand-logo">
+            <i class="fas fa-shield-alt"></i>
+            <span>AppGuard</span>
+          </div>
+          <h1 class="page-title">My Clients</h1>
+        </div>
+        <div class="user-info">
+          <div class="user-badge">
+            <i class="fas fa-user"></i>
+            <span>{{ currentUser.role === 'ADMIN' ? 'Administrator' : 'Supervisor' }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Actions and Filters -->
+      <div class="actions-section">
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Search by name, email or description..."
+            [(ngModel)]="searchQuery"
+            (input)="handleSearch()"
+          >
+        </div>
+        <div class="action-buttons">
+          <button class="btn btn-secondary" (click)="exportClients()">
+            <i class="fas fa-download"></i>
+            Export
+          </button>
+          <button class="btn btn-primary" (click)="addClient()">
+            <i class="fas fa-plus"></i>
+            New Client
+          </button>
+        </div>
+      </div>
+
+     
+      <!-- Clients Section -->
+      <div class="clients-section">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fas fa-list"></i>
+            Clients List
+          </div>
+          <div class="clients-count">
+            {{ filteredClients.length }} client{{ filteredClients.length !== 1 ? 's' : '' }}
+          </div>
+        </div>
+        
+        <div class="table-content">
+          <div class="loading" *ngIf="isLoading">
+            <div class="spinner"></div>
+            Loading clients...
+          </div>
+          
+          <table class="clients-table" *ngIf="!isLoading && filteredClients.length > 0">
+            <thead>
+              <tr>
+                <th>Client Information</th>
+                <th>Description</th>
+                <th>Supervisors</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let client of filteredClients">
+                <td>
+                  <div class="client-info">
+                    <div class="client-name">{{ client.name }}</div>
+                    <a href="mailto:{{ client.contactEmail }}" class="client-email">
+                      <i class="fas fa-envelope"></i>
+                      {{ client.contactEmail }}
+                    </a>
+                  </div>
+                </td>
+                <td>
+                  <div class="client-description">{{ client.description }}</div>
+                </td>
+                <td>
+                  <div class="supervisor-info">
+                    <div class="supervisor-badge">
+                      <i class="fas fa-user-tie"></i>
+                        {{ client.supervisorCount }} supervisor{{ client.supervisorCount > 1 ? 's' : '' }}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="actions-cell">
+                    <button class="btn-icon btn-view" (click)="viewClient(client)" title="View details">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn-icon btn-edit" (click)="editClient(client)" title="Edit">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon btn-delete" (click)="deleteClient(client)" title="Delete">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Overlay Add Client -->
+<div class="overlay" *ngIf="showAddClientForm">
+  <div class="modal">
+    <button class="close-btn" (click)="closeAddClientForm()">✖</button>
+    <!-- Liaison avec @Output() -->
+    <app-addclient (clientAdded)="onClientAdded($event)"></app-addclient>
+  </div>
+</div>
+          
+          
+          <div class="empty-state" *ngIf="!isLoading && filteredClients.length === 0">
+            <div class="empty-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="empty-title">No clients found</div>
+            <div class="empty-text">
+              Start by adding your first client or modify your search criteria to display results.
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+
+<style>
+
+.app-layout {
+  display: flex;
+  height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+app-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  position: fixed;
+  height: 100vh;
+}
+
+.contentt {
+  flex: 1;
+  margin-left: 250px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #334155; } /* Main Header */ .main-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); } .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; } .brand-section { display: flex; align-items: center; gap: 16px; } .brand-logo { display: flex; align-items: center; gap: 12px; font-size: 24px; font-weight: bold; } .brand-logo i { font-size: 28px; background: rgba(255,255,255,0.2); padding: 10px; border-radius: 12px; } .page-title { font-size: 32px; font-weight: 700; margin-left: 24px; opacity: 0.9; } .user-info { display: flex; align-items: center; gap: 16px; } .user-badge { background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; } /* Quick Navigation */ .quick-nav { background: white; border-bottom: 1px solid #e2e8f0; padding: 16px 32px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); } .nav-content { max-width: 1400px; margin: 0 auto; display: flex; gap: 24px; } .nav-link { display: flex; align-items: center; gap: 8px; padding: 8px 16px; color: #64748b; text-decoration: none; border-radius: 8px; font-weight: 500; transition: all 0.3s ease; } .nav-link:hover, .nav-link.active { background: #f1f5f9; color: #667eea; } .nav-link.active { background: linear-gradient(135deg, #667eea, #764ba2); color: white; } /* Main Content */ .main-content { max-width: 1400px; margin: 0 auto; padding: 32px; } /* Actions and Filters */ .actions-section { background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; } .search-container { position: relative; flex: 1; max-width: 400px; } .search-input { width: 100%; padding: 12px 16px 12px 48px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 14px; transition: all 0.3s ease; background: #f8fafc; } .search-input:focus { outline: none; border-color: #667eea; background: white; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); } .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #64748b; } .action-buttons { display: flex; gap: 12px; align-items: center; } .btn { padding: 12px 24px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; text-decoration: none; font-size: 14px; } .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; } .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4); } .btn-secondary { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; } .btn-secondary:hover { background: #e2e8f0; transform: translateY(-1px); } /* Statistics */ .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 32px; } .stat-card { background: white; padding: 28px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: all 0.3s ease; position: relative; overflow: hidden; } .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(135deg, #667eea, #764ba2); } .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,0.15); } .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; } .stat-title { color: #64748b; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; } .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; } .stat-icon.clients { background: linear-gradient(135deg, #667eea, #764ba2); } .stat-icon.supervisors { background: linear-gradient(135deg, #f093fb, #f5576c); } .stat-icon.active { background: linear-gradient(135deg, #4facfe, #00f2fe); } .stat-value { font-size: 36px; font-weight: 700; color: #1e293b; margin-bottom: 8px; } .stat-change { font-size: 14px; color: #10b981; display: flex; align-items: center; gap: 6px; font-weight: 500; } /* Clients Section */ .clients-section { background: white; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; overflow: hidden; } .section-header { background: #f8fafc; padding: 24px 28px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; } .section-title { font-size: 20px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 12px; } .clients-count { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; } .clients-table { width: 100%; border-collapse: collapse; } .clients-table th { background: #f8fafc; padding: 20px 28px; text-align: left; font-weight: 700; color: #475569; border-bottom: 1px solid #e2e8f0; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; } .clients-table td { padding: 24px 28px; border-bottom: 1px solid #f1f5f9; vertical-align: top; } .clients-table tbody tr { transition: all 0.2s ease; } .clients-table tbody tr:hover { background: linear-gradient(90deg, #f8fafc 0%, rgba(102, 126, 234, 0.02) 100%); } .client-info { display: flex; flex-direction: column; gap: 8px; } .client-name { font-weight: 700; color: #1e293b; font-size: 16px; } .client-email { color: #667eea; font-size: 14px; text-decoration: none; display: flex; align-items: center; gap: 8px; font-weight: 500; } .client-email:hover { text-decoration: underline; } .client-description { color: #64748b; line-height: 1.6; max-width: 350px; } .supervisor-info { display: flex; align-items: center; gap: 12px; } .supervisor-badge { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; } .actions-cell { display: flex; gap: 8px; } .btn-icon { width: 40px; height: 40px; border-radius: 10px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; font-size: 16px; } .btn-view { background: #dbeafe; color: #1d4ed8; } .btn-edit { background: #fef3c7; color: #d97706; } .btn-delete { background: #fee2e2; color: #dc2626; } .btn-icon:hover { transform: scale(1.1); } /* States */ .loading { display: flex; align-items: center; justify-content: center; padding: 60px; color: #64748b; } .spinner { width: 24px; height: 24px; border: 3px solid #e2e8f0; border-top: 3px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 16px; } @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } .empty-state { text-align: center; padding: 80px 20px; color: #64748b; } .empty-icon { font-size: 64px; color: #cbd5e1; margin-bottom: 20px; } .empty-title { font-size: 20px; font-weight: 700; margin-bottom: 12px; color: #475569; } .empty-text { font-size: 16px; line-height: 1.6; max-width: 400px; margin: 0 auto; } /* Responsive */ @media (max-width: 768px) { .main-header { padding: 20px 16px; } .header-content { flex-direction: column; gap: 16px; text-align: center; } .page-title { margin-left: 0; font-size: 24px; } .main-content { padding: 16px; } .actions-section { flex-direction: column; align-items: stretch; } .search-container { max-width: none; } .stats-grid { grid-template-columns: 1fr; gap: 16px; } .clients-table th, .clients-table td { padding: 16px; } .client-description { max-width: 250px; } } /* Animations */ @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } } .stat-card, .clients-table tbody tr { animation: fadeInUp 0.3s ease; }
+
+
+
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  max-width: 700px;
+  width: 100%;
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+
+
+
+</style>

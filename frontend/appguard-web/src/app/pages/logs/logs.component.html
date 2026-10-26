@@ -1,0 +1,431 @@
+<div class="app-layout">
+  <app-sidebar></app-sidebar>
+
+
+<app-header></app-header>
+
+  <div class="contentt">
+    <!-- Header -->
+    <div class="content-header">
+      <h2>AppGuard Logs Real Time</h2>
+    </div>
+
+
+      <!-- Filtres -->
+    <div class="filters-container">
+      <form (submit)="onFilter()" class="filters-form">
+        <div class="filter-group">
+          <label class="filter-label">Niveau :</label>
+          <select [(ngModel)]="filterLevel" name="level" class="filter-select">
+            <option value="">Tous</option>
+            <option value="INFO">INFO</option>
+            <option value="WARN">WARN</option>
+            <option value="ERROR">ERROR</option>
+            <option value="DEBUG">DEBUG</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Start date :</label>
+          <input type="date" [(ngModel)]="filterStartDate" name="startDate" class="filter-date" />
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">End date :</label>
+          <input type="date" [(ngModel)]="filterEndDate" name="endDate" class="filter-date" />
+        </div>
+
+        <button type="submit" class="filter-button">
+          <i class="fas fa-filter"></i> Filtrer
+        </button>
+      </form>
+    </div>
+
+        <!-- Statistiques et Graphique -->
+    <div class="stats-container">
+      <div class="chart-container">
+        <canvas #logChart></canvas>
+      </div>
+      <div class="stats-summary">
+        <div class="stat-item" *ngFor="let stat of levelStats | keyvalue">
+          <span class="stat-badge" [ngClass]="'level-' + stat.key">{{ stat.key }}</span>
+          <span class="stat-count">{{ stat.value }}</span>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Logs Container -->
+    <div class="logs-container">
+      <table class="logs-table" *ngIf="logs.length > 0">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Level</th>
+            <th>Message</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of logs; let i = index">
+            <td class="timestamp-cell">
+              <div class="status-indicator" [ngClass]="getStatusClass(log.level)"></div>
+              {{ log.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}
+            </td>
+            <td>
+              <span class="level-badge" [ngClass]="'level-' + log.level">{{ log.level }}</span>
+            </td>
+            <td class="message-cell">
+              <button class="expand-toggle" (click)="toggleExpand(i)">{{ isExpanded(i) ? '▼' : '▶' }}</button>
+              <span *ngIf="!isExpanded(i)" class="message-preview">{{ truncateMessage(log.message) }}</span>
+              <span *ngIf="isExpanded(i)" class="message-full">{{ log.message }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="logs.length === 0" class="no-logs">
+        No Logs Found
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Styles de base */
+ .app-layout {
+  display: flex;
+  height: 100vh;
+   
+}
+
+app-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  position:fixed;
+  height: 100vh;
+}
+
+
+.contentt {
+  flex: 1;
+   margin-left: 250px;
+ 
+}
+
+/* En-tête */
+.content-header {
+  background: white;
+  padding: 20px 30px;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.content-header h2 {
+  color: #1a1a1a;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+
+/* Styles pour les filtres */
+.filters-container {
+  background: white;
+  padding: 16px 24px;
+  margin-bottom: 1px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.filters-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+}
+
+.filter-label {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.filter-select, .filter-date {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: all 0.3s;
+  background-color: white;
+}
+
+.filter-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+  padding-right: 32px;
+}
+
+.filter-select:focus, .filter-date:focus {
+  outline: none;
+  border-color: #4d7cff;
+  box-shadow: 0 0 0 2px rgba(77, 124, 255, 0.2);
+}
+
+.filter-button {
+  padding: 8px 16px;
+  background-color: #4d7cff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+  height: 38px;
+}
+
+.filter-button:hover {
+  background-color: #3a6bfd;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .filters-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+  
+  .filter-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+
+.stats-container {
+  display: flex;
+  background: white;
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  gap: 20px;
+  width: 500px;
+   box-shadow: 0 4px 12px rgba(77, 2, 216, 0.1);
+}
+
+.chart-container {
+  width: 250px;
+  height: 250px;
+}
+
+.stats-summary {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.stat-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 70px;
+  text-align: center;
+}
+
+.level-INFO { background: #e3f2fd; color: #1976d2; }
+.level-WARN { background: #fff3e0; color: #f57c00; }
+.level-ERROR { background: #ffebee; color: #d32f2f; }
+.level-DEBUG { background: #f3e5f5; color: #7b1fa2; }
+
+.stat-count {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-container {
+    flex-direction: column;
+  }
+  
+  .chart-container {
+    width: 100%;
+    height: 200px;
+  }
+}
+
+/* Conteneur des logs */
+.logs-container {
+  flex: 1;
+  overflow: auto;
+  background: white;
+  margin: 0;
+}
+
+/* Tableau des logs */
+.logs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+}
+
+.logs-table thead {
+  background: #f8f9fa;
+  position: sticky;
+  top: 0;
+}
+
+.logs-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #e0e0e0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.logs-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: top;
+}
+
+.logs-table tbody tr:nth-of-type(odd) {
+  background: #f9f9f9;
+}
+
+.logs-table tbody tr:hover {
+  background: #f8f9ff !important;
+}
+
+/* Styles des cellules */
+.timestamp-cell {
+  color: #666;
+  white-space: nowrap;
+  width: 180px;
+}
+
+.message-cell {
+  max-width: 600px;
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
+/* Badges de niveau */
+.level-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 60px;
+  text-align: center;
+}
+
+.level-INFO { background: #e3f2fd; color: #1976d2; }
+.level-WARN { background: #fff3e0; color: #f57c00; }
+.level-ERROR { background: #ffebee; color: #d32f2f; }
+.level-DEBUG { background: #f3e5f5; color: #7b1fa2; }
+
+/* Indicateurs de statut */
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.status-info { background: #2196f3; }
+.status-warning { background: #ff9800; }
+.status-error { background: #f44336; }
+.status-success { background: #4caf50; }
+
+/* Styles pour l'extension des messages */
+.expand-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  margin-right: 8px;
+  color: #666;
+  font-size: 12px;
+}
+
+.message-preview {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: calc(100% - 30px);
+  vertical-align: middle;
+}
+
+.message-full {
+  white-space: pre-wrap;
+  display: inline-block;
+  vertical-align: middle;
+  background: #f8f9fa;
+  padding: 8px;
+  border-radius: 4px;
+  border-left: 3px solid #00bcd4;
+}
+
+/* Message quand aucun log */
+.no-logs {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+}
+
+/* Barre de défilement */
+.logs-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.logs-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.logs-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.logs-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+</style>

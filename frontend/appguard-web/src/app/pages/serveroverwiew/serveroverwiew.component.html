@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infrastructure Monitoring Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-layout">
+        <app-sidebar></app-sidebar>
+        <app-header></app-header>
+
+        <div class="contentt">
+            <div class="container">
+                <!-- Header with system information -->
+                <div class="header">
+                    <div class="header-top">
+                        <div class="header-title">
+                            <div class="icon-container">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                                </svg>
+                            </div>
+                            <div class="title-content">
+                                <h1>Infrastructure Monitoring</h1>
+                                <p class="subtitle">Real-time monitoring dashboard</p>
+                            </div>
+                        </div>
+                        <div class="refresh-controls">
+                            <div class="auto-refresh">
+                                <label>Auto-refresh:</label>
+                                <button id="autoRefreshBtn" class="toggle-btn active">ON</button>
+                            </div>
+                            <select id="refreshRate" class="refresh-select">
+                                <option value="5">5s</option>
+                                <option value="10" selected>10s</option>
+                                <option value="30">30s</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Info Cards -->
+                    <div class="info-grid">
+                        <div class="info-card server-card">
+                            <div class="card-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                                </svg>
+                            </div>
+                            <div class="card-content">
+                                <h3>Server</h3>
+                                <p class="server-name">khmilet</p>
+                                <div class="status">
+                                    <span class="status-dot online"></span>
+                                    <span class="status-text">Online</span>
+                                </div>
+                                <p class="uptime">Uptime: 15j 3h 42min</p>
+                            </div>
+                        </div>
+
+                        <div class="info-card app-card">
+                            <div class="card-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                                </svg>
+                            </div>
+                            <div class="card-content">
+                                <h3>Application</h3>
+                                <p class="app-name">AppGuard</p>
+                                <div class="status">
+                                    <span class="status-dot running"></span>
+                                    <span class="status-text">Running</span>
+                                </div>
+                                <p class="metrics">Requests: 1.2k/min</p>
+                            </div>
+                        </div>
+
+                        <div class="info-card service-card">
+                            <div class="card-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                            </div>
+                            <div class="card-content">
+                                <h3>Service</h3>
+                                <p class="service-name">MySql</p>
+                                <div class="status">
+                                    <span class="status-dot active"></span>
+                                    <span class="status-text">Active</span>
+                                </div>
+                                <p class="metrics">Response: 45ms</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Links -->
+                <div class="links-section">
+                    <h2 class="content-title">Quick Access</h2>
+                    <div class="links-grid">
+                       <a routerLink="/logs" class="link-card logs-link">
+    <div class="link-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+    </div>
+    <div class="link-content">
+        <span class="link-text">Application Logs</span>
+        <span class="link-description">View system logs</span>
+    </div>
+    <div class="link-arrow">→</div>
+</a>
+
+                      
+                        <a routerLink="/metrics" class="link-card logs-link">
+    <div class="link-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+    </div>
+    <div class="link-content">
+        <span class="link-text">Service Metrics</span>
+        <span class="link-description">Performance analytics</span>
+    </div>
+    <div class="link-arrow">→</div>
+</a>
+                        <a href="#alerts" class="link-card alerts-link">
+                            <div class="link-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 17h5l-5 5v-5zM12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                            </div>
+                            <div class="link-content">
+                                <span class="link-text">Alerts & Notifications</span>
+                                <span class="link-description">Manage alerts</span>
+                            </div>
+                            <div class="link-arrow">→</div>
+                        </a>
+                    </div>
+                </div>
+
+               <div class="chart-section">
+  <h2>CPU Usage</h2>
+  <canvas id="cpuChart" width="800" height="300"></canvas>
+</div>
+
+<div class="chart-section">
+  <h2>Memory Usage</h2>
+  <canvas id="memoryChart" width="800" height="300"></canvas>
+</div>
+
+<div class="chart-section">
+  <h2>Disk Usage</h2>
+  <canvas id="diskChart" width="800" height="300"></canvas>
+</div>
+        </div>
+    </div>
+
+
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .app-layout {
+            display: flex;
+            height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        app-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .contentt {
+            flex: 1;
+            margin-left: 280px;
+            min-height: 100vh;
+            padding: 32px;
+            overflow-y: auto;
+        }
+
+        /* Container */
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+        }
+
+        /* Header Styles */
+        .header { 
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px; 
+            padding: 32px; 
+            margin-bottom: 32px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-top { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            margin-bottom: 32px; 
+        }
+
+        .header-title { 
+            display: flex; 
+            align-items: center; 
+            gap: 20px; 
+        }
+
+        .icon-container {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .icon { 
+            width: 28px; 
+            height: 28px; 
+            color: white;
+        }
+
+        .title-content h1 { 
+            font-size: 28px; 
+            font-weight: 700; 
+            color: #0f172a;
+            background: linear-gradient(135deg, #0f172a 0%, #475569 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+
+        .subtitle { 
+            color: #64748b; 
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* Refresh Controls */
+        .refresh-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(248, 250, 252, 0.8);
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(226, 232, 240, 0.6);
+        }
+
+        .auto-refresh {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .auto-refresh label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .toggle-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #e2e8f0;
+            color: #64748b;
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .refresh-select {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            color: #475569;
+            cursor: pointer;
+        }
+
+        /* Info Grid */
+        .info-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+            gap: 24px; 
+        }
+
+        .info-card { 
+            padding: 24px; 
+            border-radius: 16px; 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 16px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: currentColor;
+            opacity: 0.6;
+        }
+
+        .info-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+        }
+
+        .server-card { 
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); 
+            color: #1e3a8a; 
+        }
+
+        .app-card { 
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); 
+            color: #14532d; 
+        }
+
+        .service-card { 
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); 
+            color: #581c87; 
+        }
+
+        .card-icon {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+
+        .card-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .card-content h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .server-name, .app-name, .service-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .status { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            margin-bottom: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.online { background: #10b981; }
+        .status-dot.running { background: #059669; }
+        .status-dot.active { background: #8b5cf6; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-text { 
+            font-weight: 600; 
+            font-size: 14px;
+        }
+
+        .uptime, .metrics {
+            font-size: 13px;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content { 
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px; 
+            padding: 32px; 
+            margin-bottom: 32px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .content-title { 
+            font-size: 20px; 
+            font-weight: 700; 
+            color: #0f172a;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .time-filter {
+            padding: 8px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .time-filter.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .cpu-display {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .cpu-usage { 
+            font-size: 48px; 
+            font-weight: 800; 
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cpu-status-indicator {
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .indicator-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .indicator-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .chart-container { 
+            height: 320px; 
+            background: rgba(248, 250, 252, 0.5);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Links Section */
+        .links-section { 
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px; 
+            padding: 32px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .links-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; 
+        }
+
+        .link-card { 
+            padding: 20px; 
+            border-radius: 12px; 
+            text-decoration: none; 
+            display: flex; 
+            align-items: center; 
+            gap: 16px; 
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .link-card:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12); 
+        }
+
+        .logs-link { 
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); 
+            color: #14532d; 
+        }
+
+        .metrics-link { 
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); 
+            color: #581c87; 
+        }
+
+        .alerts-link {
+            background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+            color: #9a3412;
+        }
+
+        .link-icon {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+
+        .link-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .link-content {
+            flex: 1;
+        }
+
+        .link-text {
+            display: block;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .link-description {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .link-arrow {
+            font-size: 18px;
+            font-weight: 600;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .link-card:hover .link-arrow {
+            transform: translateX(4px);
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .contentt {
+                margin-left: 0;
+                padding: 16px;
+            }
+
+            .header, .main-content, .links-section {
+                padding: 20px;
+            }
+
+            .info-grid, .links-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-top {
+                flex-direction: column;
+                gap: 20px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+
+   

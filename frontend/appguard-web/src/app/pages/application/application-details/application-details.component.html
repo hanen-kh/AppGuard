@@ -1,0 +1,593 @@
+
+<div class="app-layout">
+  <app-sidebar></app-sidebar>
+
+<app-header></app-header>
+
+  <div class="contentt">
+
+<div class="container" *ngIf="selectedApp">
+
+  <!-- En-tête de la page -->
+  <div class="page-header">
+    <div class="page-info">
+      <h1 class="page-title">Supervision - {{ selectedApp.name }}</h1>
+      <p class="page-subtitle">{{ selectedApp.description }}</p>
+    </div>
+    <div class="page-actions">
+      <a class="btn btn-primary btn-icon icon-logs" [routerLink]="['/logs', selectedApp.name]">Voir les logs</a>
+      <a class="btn btn-secondary btn-icon icon-download" >Exporter</a>
+    </div>
+  </div>
+
+  <!-- Informations de l'application -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon activity icon-pulse"></div>
+        Informations de l'application
+      </div>
+    </div>
+    <div class="section-content">
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-icon blue icon-database"></div>
+          <div class="info-details">
+            <div class="info-label">Nom de l'application</div>
+            <div class="info-value">{{ selectedApp.name }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon purple icon-shield"></div>
+          <div class="info-details">
+            <div class="info-label">Client</div>
+            <div class="info-value">{{ selectedApp.clientName }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon green icon-clock"></div>
+          <div class="info-details">
+            <div class="info-label">Créé le</div>
+            <div class="info-value">{{ selectedApp.createdAt | date:'d MMMM y à HH:mm' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 24px;">
+        <div class="info-item">
+          <div class="info-icon teal icon-description"></div>
+          <div class="info-details">
+            <div class="info-label">Description</div>
+            <div class="info-value description">{{ selectedApp.description }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Informations du serveur -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon server icon-server"></div>
+        Informations du serveur
+      </div>
+    </div>
+    <div class="section-content">
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-icon indigo icon-server"></div>
+          <div class="info-details">
+            <div class="info-label">Nom du serveur</div>
+            <div class="info-value">{{ selectedApp.server?.name }}</div>
+            <div style="margin-top: 8px;">
+              <span class="status-badge status-active">
+                <span class="status-dot"></span>
+                ID: {{ selectedApp.server?.id }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon orange icon-globe"></div>
+          <div class="info-details">
+            <div class="info-label">Adresse IP</div>
+            <div class="info-value mono">{{ selectedApp.server?.ip }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon yellow icon-os"></div>
+          <div class="info-details">
+            <div class="info-label">Système d'exploitation</div>
+            <div class="info-value">
+              <span class="server-badge">
+                <span class="os-ubuntu">●</span>
+                {{ selectedApp.server?.os }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Elasticsearch -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon elasticsearch icon-elastic"></div>
+        Configuration Elasticsearch
+      </div>
+    </div>
+    <div class="section-content">
+      <div class="info-item">
+        <div class="info-icon purple icon-elastic"></div>
+        <div class="info-details">
+          <div class="info-label">Index Elasticsearch</div>
+          <div class="info-value">
+            <span class="elasticsearch-index">{{ selectedApp.indexElasticsearch }}</span>
+          </div>
+          <div class="elasticsearch-actions">
+            <a class="btn btn-secondary btn-small btn-icon icon-logs">Ouvrir dans Kibana</a>
+            <a class="btn btn-secondary btn-small btn-icon icon-logs">Logs bruts</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Services -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon elasticsearch icon-services"></div>
+        Services
+      </div>
+    </div>
+   <div class="section-content" *ngIf="selectedApp.server?.services?.length">
+  <div class="info-grid">
+<div class="info-item" *ngFor="let service of selectedApp.server.services" 
+         (click)="navigateToMetrics()">      <div class="info-icon green">⚙️</div>
+      <div class="info-details">
+        <div class="info-label">Service</div>
+        <div class="info-value">{{ service }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </div>
+
+</div>
+</div>
+</div>
+
+
+<style>
+  .app-layout {
+  display: flex;
+  height: 100vh;
+   
+}
+
+app-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  position:fixed;
+  height: 100vh;
+}
+
+
+.contentt {
+  flex: 1;
+   margin-left: 250px;
+ 
+}
+      
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .page-info {
+            flex: 1;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: #718096;
+        }
+
+        .page-actions {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 14px 0 rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-icon::before {
+            font-size: 16px;
+        }
+
+        .icon-logs::before {
+            content: "📋";
+        }
+
+        .icon-download::before {
+            content: "⬇️";
+        }
+
+        .section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .section-icon.activity {
+            color: #48bb78;
+        }
+
+        .section-icon.server {
+            color: #4299e1;
+        }
+
+        .section-icon.elasticsearch {
+            color: #805ad5;
+        }
+
+        .section-content {
+            padding: 24px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .info-icon.blue {
+            background-color: #ebf8ff;
+            color: #3182ce;
+        }
+
+        .info-icon.purple {
+            background-color: #faf5ff;
+            color: #805ad5;
+        }
+
+        .info-icon.green {
+            background-color: #f0fff4;
+            color: #38a169;
+        }
+
+        .info-icon.indigo {
+            background-color: #ebf4ff;
+            color: #5a67d8;
+        }
+
+        .info-icon.orange {
+            background-color: #fffaf0;
+            color: #dd6b20;
+        }
+
+        .info-icon.teal {
+            background-color: #e6fffa;
+            color: #319795;
+        }
+
+        .info-icon.yellow {
+            background-color: #fffff0;
+            color: #d69e2e;
+        }
+
+        .info-details {
+            flex: 1;
+        }
+
+        .info-label {
+            font-size: 13px;
+            color: #718096;
+            margin-bottom: 4px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .info-value {
+            font-size: 16px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .info-value.mono {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 15px;
+            background-color: #f7fafc;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .info-value.description {
+            font-weight: 400;
+            line-height: 1.6;
+            color: #4a5568;
+        }
+
+        .server-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #edf2f7;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .os-ubuntu {
+            color: #e53e3e;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #f0fff4;
+            color: #22543d;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #38a169;
+        }
+
+        .services-empty {
+            padding: 40px 24px;
+            text-align: center;
+            color: #718096;
+            background-color: #f7fafc;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+
+        .services-empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .elasticsearch-index {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 14px;
+            display: inline-block;
+        }
+
+        .elasticsearch-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 13px;
+            border-radius: 6px;
+        }
+
+        /* Icons using CSS shapes and Unicode characters */
+        .icon-pulse::before {
+            content: "📊";
+            font-size: 18px;
+        }
+
+        .icon-database::before {
+            content: "📱";
+            font-size: 16px;
+        }
+
+        .icon-shield::before {
+            content: "👤";
+            font-size: 16px;
+        }
+
+        .icon-clock::before {
+            content: "📅";
+            font-size: 16px;
+        }
+
+        .icon-server::before {
+            content: "🖥️";
+            font-size: 16px;
+        }
+
+        .icon-globe::before {
+            content: "🌐";
+            font-size: 16px;
+        }
+
+        .icon-os::before {
+            content: "⚙️";
+            font-size: 16px;
+        }
+
+        .icon-elastic::before {
+            content: "🔍";
+            font-size: 18px;
+        }
+
+        .icon-description::before {
+            content: "📝";
+            font-size: 16px;
+        }
+
+        .icon-services::before {
+            content: "⚡";
+            font-size: 18px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+            
+            .page-actions {
+                justify-content: flex-start;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .section-content {
+                padding: 20px;
+            }
+            
+            .info-item {
+                gap: 12px;
+            }
+            
+            .info-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .elasticsearch-actions {
+                flex-direction: column;
+            }
+        }
+
+
+
+</style>

@@ -1,0 +1,303 @@
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .form-container {
+        background: white;
+        padding: 25px; /* réduit de 40px → 25px */
+        border-radius: 15px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 650px; /* un peu plus étroit */
+        animation: slideIn 0.4s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-title {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px; /* réduit */
+        font-size: 24px; /* réduit */
+        font-weight: 600;
+    }
+
+    .form-title i {
+        color: #3498db;
+        margin-right: 8px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px; /* réduit */
+        margin-bottom: 15px; /* réduit */
+    }
+
+    .form-group {
+        margin-bottom: 15px; /* réduit */
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px; /* réduit */
+        color: #555;
+        font-weight: 500;
+        font-size: 13px;
+    }
+
+    .required {
+        color: #e74c3c;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 8px 12px; /* réduit */
+        border: 1.5px solid #e9ecef; /* un peu plus fin */
+        border-radius: 6px;
+        font-size: 13px;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.15);
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 70px; /* réduit */
+    }
+
+    select {
+        cursor: pointer;
+    }
+
+    .cron-helper {
+        background: #f8f9fa;
+        padding: 10px; /* réduit */
+        border-radius: 6px;
+        border-left: 3px solid #3498db;
+        margin-top: 5px; /* réduit */
+        font-size: 11px;
+        color: #666;
+    }
+
+    .server-section {
+        background: #f8f9fa;
+        padding: 15px; /* réduit */
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        margin-bottom: 20px; /* réduit */
+    }
+
+    .server-section h3 {
+        margin-bottom: 10px;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .status-options {
+        display: flex;
+        gap: 10px; /* réduit */
+        margin-top: 5px; /* réduit */
+    }
+
+    .radio-item input[type="radio"] {
+        width: 16px;
+        height: 16px;
+        margin-right: 6px;
+        cursor: pointer;
+        accent-color: #3498db;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px; /* réduit */
+        margin-top: 20px; /* réduit */
+        justify-content: center;
+    }
+
+    .btn {
+        padding: 10px 20px; /* réduit */
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .form-container {
+            padding: 20px;
+            margin: 5px;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .button-group {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+
+        .status-options {
+            flex-direction: column;
+            gap: 6px;
+        }
+    }
+</style>
+
+
+
+    <div class="form-container">
+  <h1 class="form-title"><i class="fas fa-clock"></i> Create Cron Job</h1>
+
+  <form [formGroup]="cronForm" (ngSubmit)="createCronJob()">
+    <div class="form-row">
+      <!-- Job Name -->
+      <div class="form-group">
+        <label for="name">Job Name <span class="required">*</span></label>
+        <input type="text" id="name" formControlName="name" placeholder="Cron job name">
+      </div>
+
+      <!-- Cron Expression -->
+      <div class="form-group">
+        <label for="cronExpression">Expression Cron <span class="required">*</span></label>
+        <input type="text" id="cronExpression" formControlName="cronExpression" placeholder="0 0 12 * * ?">
+        <div class="cron-helper">
+          <strong>Format:</strong> second minute hour day month day-of-week
+          <div class="cron-examples">
+            <strong>Examples:</strong><br>
+            • <code>0 0 12 * * ?</code> - Every day at 12:00 PM<br>
+            • <code>0 */15 * * * ?</code> - Every 15 minutes<br>
+            • <code>0 0 9 * * MON-FRI</code> - 9:00 AM Monday to Friday
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Command -->
+    <div class="form-group">
+      <label for="command">Command to Execute <span class="required">*</span></label>
+      <input type="text" id="command" formControlName="command" placeholder="/path/to/script.sh or system command">
+    </div>
+
+    <!-- Server Selection -->
+  <div class="server-section">
+  <h3><i class="fas fa-server"></i> Execution Server <span class="required">*</span></h3>
+  <select id="serverId" formControlName="serverId" required
+          [class.error]="cronForm.get('serverId')?.invalid && cronForm.get('serverId')?.touched">
+    <option value="">Select a server</option>
+    <option *ngFor="let srv of servers" [value]="srv.id">{{ srv.name }}</option>
+  </select>
+  
+  <!-- Message d'erreur -->
+  <div *ngIf="cronForm.get('serverId')?.invalid && cronForm.get('serverId')?.touched" 
+       class="error-message">
+    Please select a server
+  </div>
+  
+  <!-- Affichez si aucun serveur n'est disponible -->
+  <div *ngIf="servers.length === 0" class="error-message">
+    No servers available. Please add a server first.
+  </div>
+</div>
+
+    <!-- Description -->
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" formControlName="description" placeholder="Detailed description of the cron job"></textarea>
+    </div>
+
+    <div class="form-row">
+      <!-- Timeout -->
+      <div class="form-group">
+        <label for="timeoutMinutes">Timeout (minutes)</label>
+        <input type="number" id="timeoutMinutes" formControlName="timeoutMinutes" min="1" max="1440">
+      </div>
+
+      <!-- Retry Count -->
+      <div class="form-group">
+        <label for="retryCount">Retry Count</label>
+        <input type="number" id="retryCount" formControlName="retryCount" min="0" max="10">
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="form-group">
+      <label>Status <span class="required">*</span></label>
+      <div class="status-options">
+        <div class="radio-item">
+          <input type="radio" id="statusActive" value="ACTIVE" formControlName="status">
+          <label for="statusActive">🟢 Active</label>
+        </div>
+        <div class="radio-item">
+          <input type="radio" id="statusInactive" value="INACTIVE" formControlName="status">
+          <label for="statusInactive">🔴 Inactive</label>
+        </div>
+        <div class="radio-item">
+          <input type="radio" id="statusPaused" value="PAUSED" formControlName="status">
+          <label for="statusPaused">⏸️ Paused</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="button-group">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-plus-circle"></i> Create Job
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="cronForm.reset({ timeoutMinutes:60, retryCount:0, status:'ACTIVE' })">
+        <i class="fas fa-undo"></i> Reset
+      </button>
+    </div>
+  </form>
+</div>

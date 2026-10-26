@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Création d'un Client</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+      .app-layout {
+  display: flex;
+  height: 100vh;
+}
+
+app-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  position: fixed;
+  height: 100vh;
+}
+
+.contentt {
+  flex: 1;
+  margin-left: 250px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .supervisor-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .supervisor-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .checkbox-item:hover {
+            background: #f0f7ff;
+            border-color: #3498db;
+            transform: translateY(-1px);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #3498db;
+        }
+
+        .supervisor-info {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .supervisor-name {
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .supervisor-clients {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(149, 165, 166, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(149, 165, 166, 0.4);
+        }
+
+        .success-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            border: 1px solid #c3e6cb;
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 25px;
+                margin: 10px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<!-- Modal contrôlé par le parent via *ngIf="showAddClientForm" -->
+<div class="form-container modal-content">
+  <h1 class="form-title">🏢 Add New Client</h1>
+
+  <form [formGroup]="clientForm" (ngSubmit)="addClient()">
+    <div class="form-group">
+      <label for="name">Client name <span class="required">*</span></label>
+      <input type="text" id="name" formControlName="name" placeholder="Client name">
+    </div>
+
+    <div class="form-group">
+      <label for="contactEmail">Email <span class="required">*</span></label>
+      <input type="email" id="contactEmail" formControlName="contactEmail" placeholder="example@email.com">
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" formControlName="description" placeholder="Description of the client"></textarea>
+    </div>
+
+    <div class="supervisor-section">
+      <h3>👥 Select Supervisors <span class="required">*</span></h3>
+      <div class="checkbox-group">
+        <div *ngFor="let supervisor of supervisorsList" class="checkbox-item">
+          <input type="checkbox"
+                 [checked]="clientForm.value.supervisorIds.includes(supervisor.id)"
+                 (change)="toggleSupervisor(supervisor.id)">
+          <label class="supervisor-info">
+            <span class="supervisor-name">{{ supervisor.firstName }} {{ supervisor.lastName }}</span>
+            <span class="supervisor-clients">{{ supervisor.clientCount }} client{{ supervisor.clientCount > 1 ? 's' : '' }}</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button type="submit" class="btn btn-primary">✅ Create Client</button>
+      <button type="button" class="btn btn-secondary" (click)="clientForm.reset({ supervisorIds: [] })">🔄 Reset</button>
+    </div>
+  </form>
+</div>

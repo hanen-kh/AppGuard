@@ -1,0 +1,630 @@
+<div class="app-layout">
+  <app-sidebar></app-sidebar>
+  <app-header></app-header>
+
+  <div class="contentt">
+    <div class="server-management">
+  <div class="header">
+    <h1>Server Management</h1>
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="refreshServers()">
+        <i class="icon-reload"></i>
+        Reload servers
+      </button>
+      <button class="btn-primary" (click)="createServer()">
+        <i class="icon-plus"></i>
+        Create server
+      </button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="left-controls">
+      <div class="manage-server-dropdown">
+        <button class="btn-manage-server" (click)="toggleManageDropdown()" [class.active]="showManageDropdown">
+          <span>Manage server</span>
+          <i class="dropdown-arrow">▼</i>
+        </button>
+        <div class="dropdown-menu" [class.show]="showManageDropdown">
+          <div class="dropdown-section">
+            <div class="dropdown-label">Server options</div>
+            <a class="dropdown-item" (click)="showServerOverview()">Show server overview</a>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-section">
+            <a class="dropdown-item" (click)="closeServer()">Put server in maintenance</a>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-section">
+            <a class="dropdown-item danger" (click)="deleteServer()">Delete server</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="search-bar">
+        <input 
+          type="text" 
+          placeholder="Search" 
+          class="search-input" 
+          [(ngModel)]="searchTerm"
+          (input)="filterServers()"
+        />
+      </div>
+    </div>
+    
+    <div class="filters">
+      <select class="filter-select" [(ngModel)]="statusFilter" (change)="filterServers()">
+        <option value="">Status</option>
+        <option value="ACTIVE">Active</option>
+        <option value="INACTIVE">Inactive</option>
+        <option value="MAINTENANCE">Maintenance</option>
+        <option value="UNREACHABLE">Unreachable</option>
+      </select>
+      
+      <div class="toggle-options">
+        <label class="toggle">
+          <input type="checkbox" [(ngModel)]="includeHidden" (change)="filterServers()">
+          <span>Include hidden servers</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table class="servers-table">
+      <thead>
+        <tr>
+          <th>
+            <input 
+              type="checkbox" 
+              [checked]="allSelected" 
+              (change)="toggleSelectAll($event)"
+            >
+          </th>
+          <th class="sortable" (click)="sortServers('name')">
+            Name 
+            <i class="sort-icon" 
+              [class.sort-asc]="sortColumn === 'name' && sortDirection === 'asc'"
+              [class.sort-desc]="sortColumn === 'name' && sortDirection === 'desc'">
+            </i>
+          </th>
+          <th class="sortable" (click)="sortServers('status')">
+            Status
+            <i class="sort-icon"
+              [class.sort-asc]="sortColumn === 'status' && sortDirection === 'asc'"
+              [class.sort-desc]="sortColumn === 'status' && sortDirection === 'desc'">
+            </i>
+          </th>
+          <th class="sortable" (click)="sortServers('os')">
+            OS
+            <i class="sort-icon"
+              [class.sort-asc]="sortColumn === 'os' && sortDirection === 'asc'"
+              [class.sort-desc]="sortColumn === 'os' && sortDirection === 'desc'">
+            </i>
+          </th>
+          <th class="sortable" (click)="sortServers('client')">
+            Client
+            <i class="sort-icon"
+              [class.sort-asc]="sortColumn === 'client' && sortDirection === 'asc'"
+              [class.sort-desc]="sortColumn === 'client' && sortDirection === 'desc'">
+            </i>
+          </th>
+          <th class="sortable" (click)="sortServers('cronJobs')">
+            Cron Jobs
+            <i class="sort-icon"
+              [class.sort-asc]="sortColumn === 'cronJobs' && sortDirection === 'asc'"
+              [class.sort-desc]="sortColumn === 'cronJobs' && sortDirection === 'desc'">
+            </i>
+          </th>
+          <th class="sortable" (click)="sortServers('applications')">
+            Applications
+            <i class="sort-icon"
+              [class.sort-asc]="sortColumn === 'applications' && sortDirection === 'asc'"
+              [class.sort-desc]="sortColumn === 'applications' && sortDirection === 'desc'">
+            </i>
+          </th>
+          <th class="sortable" (click)="sortServers('services')">
+            Services
+            <i class="sort-icon"
+              [class.sort-asc]="sortColumn === 'services' && sortDirection === 'asc'"
+              [class.sort-desc]="sortColumn === 'services' && sortDirection === 'desc'">
+            </i>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr 
+          *ngFor="let server of filteredServers" 
+          [class.selected]="isSelected(server)"
+          (click)="selectServer(server, $event)"
+        >
+          <td>
+            <input 
+              type="checkbox" 
+              [checked]="isSelected(server)" 
+              (click)="$event.stopPropagation()"
+              (change)="toggleServerSelection(server)"
+            >
+          </td>
+          <td>
+            <a class="server-link" (click)="showServerDetails(server); $event.stopPropagation()">
+              {{server.name}}
+            </a>
+          </td>
+          <td>
+            <span class="status-badge" [ngClass]="{
+              'status-active': server.status === 'ACTIVE',
+              'status-inactive': server.status === 'INACTIVE',
+              'status-maintenance': server.status === 'MAINTENANCE',
+              'status-error': server.status === 'UNREACHABLE'
+            }">
+              <span class="status-dot"></span>
+              {{server.status | titlecase}}
+            </span>
+          </td>
+          <td>{{server.os}}</td>
+          <td>{{server.client}}</td>
+          <td>{{server.cronJobs}}</td>
+          <td>{{server.applications}}</td>
+          <td>{{server.servicesNb}}</td>
+        </tr>
+        <tr *ngIf="filteredServers.length === 0">
+          <td colspan="8" class="no-results">No servers found matching your criteria</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+  </div>
+</div>
+
+<style>
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.app-layout {
+  display: flex;
+  height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+app-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  position: fixed;
+  height: 100vh;
+}
+
+.contentt {
+  flex: 1;
+  margin-left: 250px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+.server-management {
+    margin-top: 40px;
+  padding: 40px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1c21;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-primary, .btn-secondary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: #0066cc;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0052a3;
+}
+
+.btn-secondary {
+  background-color: white;
+  color: #69707d;
+  border: 1px solid #d3dae6;
+}
+
+.btn-secondary:hover {
+  background-color: #f7fafc;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.left-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.manage-server-dropdown {
+  position: relative;
+}
+
+.btn-manage-server {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 140px;
+  justify-content: space-between;
+}
+
+.btn-manage-server:hover {
+  background-color: #0052a3;
+}
+
+.btn-manage-server.active {
+  background-color: #0052a3;
+}
+
+.dropdown-arrow {
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.btn-manage-server.active .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: white;
+  border: 1px solid #d3dae6;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  min-width: 220px;
+  z-index: 1000;
+  display: none;
+  overflow: hidden;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-section {
+  padding: 8px 0;
+}
+
+.dropdown-label {
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #69707d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background-color: #f7fafc;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 8px 16px;
+  color: #1a1c21;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #f7fafc;
+}
+
+.dropdown-item.danger {
+  color: #c53030;
+}
+
+.dropdown-item.danger:hover {
+  background-color: #fdf2f2;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: #eef2f7;
+  margin: 0;
+}
+
+.search-bar {
+  flex: 1;
+  max-width: 300px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d3dae6;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: white;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 1px #0066cc;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #d3dae6;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.toggle-options {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #69707d;
+  cursor: pointer;
+}
+
+.toggle input[type="checkbox"] {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  appearance: none;
+  border: 1px solid #d3dae6;
+  border-radius: 3px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.toggle input[type="checkbox"]:checked {
+  background-color: #0066cc;
+  border-color: #0066cc;
+}
+
+.toggle input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -2px;
+  left: 2px;
+  color: white;
+  font-size: 12px;
+}
+
+.table-container {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.servers-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.servers-table th,
+.servers-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.servers-table th {
+  background-color: #f7fafc;
+  font-weight: 600;
+  color: #69707d;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.servers-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.servers-table th.sortable:hover {
+  background-color: #eef2f7;
+}
+
+.servers-table th i {
+  margin-left: 4px;
+  font-size: 10px;
+  opacity: 0.5;
+}
+
+.servers-table tbody tr:hover {
+  background-color: #f7fafc;
+}
+
+.servers-table tbody tr.selected {
+  background-color: #e6f3ff;
+}
+
+.server-link {
+  color: #0066cc;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.server-link:hover {
+  text-decoration: underline;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-active {
+  background-color: #d1f2df;
+  color: #017d3a;
+}
+
+.status-active .status-dot {
+  background-color: #017d3a;
+}
+
+.status-inactive {
+  background-color: #fef5e7;
+  color: #b95000;
+}
+
+.status-inactive .status-dot {
+  background-color: #b95000;
+}
+
+.status-maintenance {
+  background-color: #fef5e7;
+  color: #b95000;
+}
+
+.status-maintenance .status-dot {
+  background-color: #b95000;
+}
+
+.status-error {
+  background-color: #fdf2f2;
+  color: #c53030;
+}
+
+.status-error .status-dot {
+  background-color: #c53030;
+}
+
+.no-results {
+  text-align: center;
+  color: #718096;
+  padding: 20px;
+}
+
+.icon-reload::before {
+  content: '↻';
+  font-size: 14px;
+}
+
+.icon-plus::before {
+  content: '+';
+  font-size: 16px;
+}
+
+.sort-icon::before {
+  content: '↕';
+}
+
+.sort-asc::before {
+  content: '↑';
+}
+
+.sort-desc::before {
+  content: '↓';
+}
+
+@media (max-width: 768px) {
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .left-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .search-bar {
+    max-width: none;
+  }
+
+  .filters {
+    justify-content: space-between;
+  }
+
+  .toggle-options {
+    justify-content: center;
+  }
+
+  .manage-server-dropdown {
+    align-self: flex-start;
+  }
+}
+</style>

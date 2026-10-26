@@ -1,0 +1,11 @@
+.idea/
+**/.idea/
+**/target/
+**/node_modules/
+**/dist/
+**/.angular/
+**/app.logs
+*.log
+.env
+.env.*
+!.env.example

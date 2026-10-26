@@ -1,0 +1,372 @@
+<div class="app-layout">
+  <!-- Sidebar fixe -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Contenu principal -->
+  <div class="contentt">
+    <!-- Statistiques -->
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{totalUsers}}</div>
+          <div class="stat-label">Utilisateurs Totaux</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{adminCount}}</div>
+          <div class="stat-label">Administrateurs</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-user-tie"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{supervisorCount}}</div>
+          <div class="stat-label">Superviseurs</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{dataAnalystCount}}</div>
+          <div class="stat-label">Analystes de données</div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Conteneur pour le modal et le graphique, côte à côte -->
+    <div class="modal-wrapper">
+      <!-- Modal (partie formulaire) -->
+      <div class="modal">
+        <div class="modal-content">
+          <!-- Partie gauche avec logo -->
+          <div class="left-side">
+            <img class="logo" src="/assets/images/AppGard.png" alt="Logo"> 
+            <img class="logo" src="/assets/images/AppGuard.png" alt="Logo">
+          </div>
+
+          <!-- Partie droite avec formulaire -->
+          <div class="right-side">
+            <h1>{{ isEditMode ? 'Modifier un utilisateur' : 'Add New User' }}</h1>
+
+            <form [formGroup]="userForm" (ngSubmit)="onSubmit()" novalidate>
+              <div class="txt_field">
+                <input type="text" id="firstname" formControlName="firstname" required>
+                <span></span>
+                <label for="firstname">First Name</label>
+              </div>
+
+              <div class="txt_field">
+                <input type="text" id="lastname" formControlName="lastname" required>
+                <span></span>
+                <label for="lastname">Last Name</label>
+              </div>
+
+              <div class="txt_field">
+                <input type="email" id="email" formControlName="email" required>
+                <span></span>
+                <label for="email">Email</label>
+              </div>
+
+              <!-- Dropdown pour le rôle -->
+              <div class="txt_field">
+                <select id="roleId" formControlName="roleId" required>
+                  <option value="" disabled selected>-- Select A Role --</option>
+                  <option *ngFor="let role of roles" [value]="role.id">{{ role.name }}</option>
+                </select>
+                <span></span>
+              </div>
+
+              <!-- Affichage du message d'erreur -->
+            <div *ngIf="errorMessage" class="error-message" style="color: red; margin-bottom: 10px;">
+             {{ errorMessage }}
+            </div>
+
+              <input type="submit" [disabled]="userForm.invalid" [value]="isEditMode ? 'Mettre à jour' : 'ADD'">
+
+              <div class="signup_link">
+                <a [routerLink]="'/users'">View All Users</a>
+              </div>
+
+              <button type="button" class="cancelbtn" [routerLink]="'/mainlayout'">Cancel</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graph area à droite -->
+      <div class="graph-container">
+        <h2>Statistiques</h2>
+        <div class="graph-placeholder">
+          <!-- Ex: <canvas id="myChart"></canvas> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+
+
+.error-message {
+  background-color: #ffe0e0;
+  border: 1px solid #ff4c4c;
+  color: #b30000;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+
+ .app-layout {
+  display: flex;
+  height: 100vh;
+   
+}
+
+app-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  position:fixed;
+  height: 100vh;
+}
+
+
+.contentt {
+  flex: 1;
+   margin-left: 250px;
+ 
+}
+
+/* Stats cards styles */
+.stats-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  flex: 1;
+  min-width: 200px;
+  margin: 10px;
+}
+
+.stat-icon {
+  font-size: 2rem;
+  color: #0d345e;
+  margin-right: 15px;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+/* Modal and Graph layout */
+.modal-wrapper {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+/* Modal styles */
+.modal {
+  width: 60%;
+}
+
+.modal-content {
+  display: flex;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Partie gauche avec logo (fond bleu) */
+.left-side {
+  width: 40%;
+  background-color: #020946;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.left-side img {
+  max-width: 70%;
+  height: auto;
+  margin: 10px 0;
+}
+
+/* Partie droite avec formulaire */
+.right-side {
+  width: 50%;
+  background-color: #ffffff;
+  padding: 40px;
+  position: relative;
+}
+
+.right-side h1 {
+  text-align: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid silver;
+  font-size: 1.5rem;
+}
+
+form {
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.txt_field {
+  position: relative;
+  border-bottom: 2px solid #adadad;
+  margin: 30px 0;
+}
+
+.txt_field input, .txt_field select {
+  width: 100%;
+  padding: 0 5px;
+  height: 40px;
+  font-size: 16px;
+  border: none;
+  background: none;
+  outline: none;
+}
+
+.txt_field label {
+  position: absolute;
+  top: 50%;
+  left: 5px;
+  color: #adadad;
+  transform: translateY(-50%);
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.5s;
+}
+
+.txt_field span::before {
+  content: '';
+  position: absolute;
+  top: 40px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background: #2691d9;
+  transition: 0.5s;
+}
+
+.txt_field input:focus ~ label,
+.txt_field input:valid ~ label {
+  top: -5px;
+  color: #2691d9;
+}
+
+.txt_field input:focus ~ span::before,
+.txt_field input:valid ~ span::before {
+  width: 100%;
+}
+
+input[type="submit"] {
+  width: 100%;
+  height: 50px;
+  border: 1px solid;
+  background: #2691d9;
+  border-radius: 25px;
+  font-size: 18px;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+}
+
+input[type="submit"]:hover {
+  background-color: #217ac0;
+  transition: 0.3s;
+}
+
+.signup_link {
+  margin: 20px 0;
+  text-align: center;
+  font-size: 14px;
+  color: #666666;
+}
+
+.signup_link a {
+  color: #2691d9;
+  text-decoration: none;
+}
+
+.signup_link a:hover {
+  text-decoration: underline;
+}
+
+.cancelbtn {
+  background-color: #807b7b;
+  border: none;
+  color: white;
+  padding: 10px 18px;
+  margin-top: 10px;
+  width: 100%;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cancelbtn:hover {
+  background-color: #020346;
+}
+
+/* Graph container styles */
+.graph-container {
+  width: 40%;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.graph-placeholder {
+  width: 100%;
+  height: 300px;
+  background: #f6f6f6;
+  border: 1px dashed #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: italic;
+  color: #888;
+}
+</style>

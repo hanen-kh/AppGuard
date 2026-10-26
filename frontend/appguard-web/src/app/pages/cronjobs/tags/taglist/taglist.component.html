@@ -1,0 +1,136 @@
+<div class="overlay">
+  <div class="modal">
+    <!-- Bouton fermer -->
+    <button class="close-btn" (click)="closeModal()">✖</button>
+
+    <h3>All Tags</h3>
+
+    <table class="tag-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Add</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let tag of allTags">
+          <td>{{ tag.name }}</td>
+          <td>
+            <span [ngClass]="getTagClass(tag.type)">
+              {{ tag.type }}
+            </span>
+          </td>
+          <td>
+            <button class="add-btn" (click)="addTagToCron(tag)">
+              Add
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+    .overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+h3 {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  color: #1f2937;
+}
+
+.tag-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tag-table th, .tag-table td {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tag-table th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+.add-btn {
+  padding: 0.25rem 0.5rem;
+  background-color: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background 0.2s;
+}
+
+.add-btn:hover {
+  background-color: #2563eb;
+}
+
+/* Tag type colors */
+.tag-environment {
+  background-color: #dcfce7;
+  color: #166534;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+}
+
+.tag-client {
+  background-color: #dbeafe;
+  color: #1e40af;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+}
+
+.tag-type {
+  background-color: #f3e8ff;
+  color: #7c2d12;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+}
+
+.tag-priority {
+  background-color: #fef2f2;
+  color: #dc2626;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+}
+
+.tag-custom {
+  background-color: #f9fafb;
+  color: #374151;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+}
+
+</style>

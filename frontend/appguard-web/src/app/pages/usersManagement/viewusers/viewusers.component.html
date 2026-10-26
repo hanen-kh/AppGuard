@@ -1,0 +1,340 @@
+
+<div class="app-layout">
+  <app-sidebar></app-sidebar>
+
+
+<div class="contentt">
+    <!-- Statistiques -->
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{totalUsers}}</div>
+          <div class="stat-label">Total Users</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{adminCount}}</div>
+          <div class="stat-label">Admins</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-user-tie"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{supervisorCount}}</div>
+          <div class="stat-label">Supervisors</div>
+        </div>
+      </div>
+      
+    
+    </div>
+<div class="container">
+    <!-- Header with search and filter -->
+    <div class="header">
+      <h2><i class="fas fa-users"></i> User Management</h2>
+      <div class="filter">
+        <select id="roleFilter" [(ngModel)]="selectedRole" (change)="filterUsersByRole()">
+          <option value="">All Roles</option>
+          <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+        </select>
+      </div>
+    </div>
+  
+    <div class="main-content">
+      <!-- Tableau des utilisateurs -->
+      <div class="user-table">
+        <div class="table-header">
+          <h3>Users List</h3>
+          <button class="add-user-btn" [routerLink]="'/adduser'">+ Add User</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>ID</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of filteredUsers; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td><span class="badge-id">{{ user.id }}</span></td>
+              <td>{{ user.firstname }}</td>
+              <td>{{ user.lastname }}</td>
+              <td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
+              <td><span class="badge" [ngClass]="{
+                'badge-admin': user.typeRole === 'ADMIN',
+                'badge-supervisor': user.typeRole === 'SUPERVISOR',
+                'badge-analyst': user.typeRole === 'DATA_ANALYST'
+              }">{{ user.typeRole }}</span></td>
+              <td>
+                <button class="btn-edit" (click)="editUser(user)">Edit</button>
+                <button class="btn-delete" (click)="deleteUser(user.id)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="footer-info">Showing {{ filteredUsers?.length || 0 }} users</p>
+      </div>
+  
+      <!-- Formulaire -->
+      <div class="user-form" *ngIf="selectedUser" >
+        <div class="avatar">{{ selectedUser.firstname?.charAt(0) }}{{ selectedUser.lastname?.charAt(0) }}</div>
+        <h4>{{ selectedUser.firstname }} {{ selectedUser.lastname }}</h4>
+        <p>{{ selectedUser.email }}</p>
+        <form [formGroup]="userForm" (ngSubmit)="Update()">
+          <input formControlName="firstname" placeholder="First Name" [disabled]="!isEditMode">
+          <input formControlName="lastname" placeholder="Last Name" [disabled]="!isEditMode">
+          <input type="email" formControlName="email" placeholder="Email" [disabled]="!isEditMode">
+          <select formControlName="typeRole" [disabled]="!isEditMode">
+            <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+          </select>
+          <div class="form-buttons">
+            <button *ngIf="!isEditMode" type="button">Edit Profile</button>
+            <button *ngIf="isEditMode" type="submit">Save Changes</button>
+            <button *ngIf="isEditMode" type="button">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+  <style>
+
+/* Stats cards styles */
+.stats-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  flex: 1;
+  min-width: 200px;
+  margin: 10px;
+}
+
+.stat-icon {
+  font-size: 2rem;
+  color: #0d345e;
+  margin-right: 15px;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+
+
+ .app-layout {
+  display: flex;
+  height: 100vh;
+   
+}
+
+app-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  position:fixed;
+  height: 100vh;
+}
+
+
+.contentt {
+  flex: 1;
+   margin-left: 250px;
+ 
+}
+
+    .container {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+      color: #333;
+    }
+  
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+  
+    .header h2 {
+      font-size: 28px;
+      color: #1a73e8;
+    }
+  
+    .filter select {
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+  
+    .main-content {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+  
+    .user-table {
+      flex: 1;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+  
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+  
+    .add-user-btn {
+      background: #0a0255;
+      color: rgb(253, 253, 253);
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+  
+    th, td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+  
+    th {
+      background: #f7f7f7;
+      font-weight: 600;
+    }
+  
+    .badge-id {
+      background: #888;
+      padding: 4px 8px;
+      color: white;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+  
+    .badge-role {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: white;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .badge-role.admin { background: #007bff; }
+    .badge-role.user { background: #28a745; }
+    .badge-role.manager { background: #17a2b8; }
+    .badge-role.guest { background: #ffc107; color: #333; }
+  
+    .btn-edit, .btn-delete {
+      border: none;
+      padding: 6px 12px;
+      margin: 0 4px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn-edit { background: #ffc107; color: #000; }
+    .btn-delete { background: #dc3545; color: #fff; }
+  
+    .footer-info {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #666;
+    }
+  
+    .user-form {
+      width: 300px;
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+  
+    .avatar {
+      width: 80px;
+      height: 80px;
+      background: #1a73e8;
+      color: #fff;
+      border-radius: 50%;
+      font-size: 30px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+    }
+  
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+  
+    .form-buttons {
+      display: flex;
+      justify-content: space-between;
+    }
+  
+    .form-buttons button {
+      flex: 1;
+      margin: 0 5px;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .form-buttons button:nth-child(1) { background: #007bff; color: #fff; }
+    .form-buttons button:nth-child(2) { background: #28a745; color: #fff; }
+    .form-buttons button:nth-child(3) { background: #6c757d; color: #fff; }
+  </style>
+  
